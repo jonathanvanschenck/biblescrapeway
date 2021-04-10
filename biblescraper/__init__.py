@@ -1,2 +1,4 @@
 
+
 from .scraper import scrap
+from . import errors
