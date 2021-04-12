@@ -5,16 +5,42 @@ import requests as r
 from .errors import BadQueryError
 
 # TODO : clean up the strings to be asciii safe? i.e. \u2014 -> '--'
-# TODO : modify to allow verse or chapter scraping
+# TODO : error check the r.get 
 
-def scrap(B="John", C=1, V="ESV"):
-    URL = "https://www.biblegateway.com/passage/?search={}+{}&version={}".format(B.replace(" ","+"),C,V)
+def scrap(book, chapter, verse = None, version="ESV"):
+    """Scrap a verse or chapter from the web
+
+    Params
+    -----
+    book : str
+        The normalized name of the book to query (i.e. "Genesis" not "gen" and "1 John" not "1J")
+
+    chapter : int
+        The chapter to query
+
+    verse (optional) : int
+        The verse to query, if any. Default is None, which will query the entire chapter.
+
+    version (optional) : str
+        The bible version to query from, default is "ESV"
+        
+    Returns
+    -------
+    verse_json : json
+        Either a list of, or just the single verse object in formatted json
+    """
+
+    if verse is None:
+        URL = "https://www.biblegateway.com/passage/?search={}+{}&version={}".format(book.replace(" ","+"),chapter,version)
+    else:
+        URL = "https://www.biblegateway.com/passage/?search={}+{}:{}&version={}".format(book.replace(" ","+"),chapter,verse,version)
+
     page = r.get(URL)
     
     sc = BeautifulSoup(page.content, "html.parser")
 
     if "No results found" in sc.text:
-        raise BadQueryError("Cannot get {} {} ({})".format(B,C,V))
+        raise BadQueryError("Cannot get {} {} ({})".format(book,chapter,version))
     
     # Get all the p tags underneath the passage content
     #  which are all the verse, and no headings
@@ -55,7 +81,9 @@ def scrap(B="John", C=1, V="ESV"):
         verses.append(dict(
             text = "",
             verse = v,
-            chapter = C,
+            chapter = chapter,
+            book = book,
+            version = version,
             footnotes = []
         ))
 
@@ -90,5 +118,7 @@ def scrap(B="John", C=1, V="ESV"):
                 ))
                 continue
 
-    return verses
+    if verse is None:
+        return verses
+    return verses[0]
 
