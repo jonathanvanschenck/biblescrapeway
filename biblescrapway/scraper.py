@@ -3,44 +3,81 @@ from bs4 import BeautifulSoup
 import requests as r
 
 from .errors import BadQueryError
+from .reference import Reference
 
 # TODO : clean up the strings to be asciii safe? i.e. \u2014 -> '--'
 # TODO : error check the r.get 
 
-def scrap(book, chapter, verse = None, version="ESV"):
+class Verse(Reference):
+    def __init__(self, book, chapter, verse, version, text="", footnotes=[]):
+        super().__init__(book, chapter, verse)
+        self.text = text
+        self.version = version
+        self.footnotes = footnotes
+
+    def __repr__(self):
+        return "<Verse: {}>".format(super().to_string())
+
+    def to_string(self):
+        return "{} `{}` ({})".format(super().to_string(),self.text,self.version)
+
+    def to_dict(self):
+        return dict(
+            book = self.book,
+            chapter = self.chapter,
+            verse = self.verse,
+            version = self.version,
+            text = self.text,
+            footnotes = self.footnotes
+        )
+
+    @classmethod
+    def from_dict(cls,obj):
+        return cls(**obj)
+
+    def add_footnote(self, footnote):
+        self.footnotes.append(footnote)
+
+def scrap(ref_string_or_obj, version="ESV"):
     """Scrap a verse or chapter from the web
-
     Params
-    -----
-    book : str
-        The normalized name of the book to query (i.e. "Genesis" not "gen" and "1 John" not "1J")
-
-    chapter : int
-        The chapter to query
-
-    verse (optional) : int
-        The verse to query, if any. Default is None, which will query the entire chapter.
+    ------
+    ref_string_or_obj : str or Reference
+        The string of a chapter/verse to query
 
     version (optional) : str
         The bible version to query from, default is "ESV"
         
     Returns
     -------
-    verse_json : json
+    Verse_or_list : Verse,list of Verses
         Either a list of, or just the single verse object in formatted json
     """
-
-    if verse is None:
-        URL = "https://www.biblegateway.com/passage/?search={}+{}&version={}".format(book.replace(" ","+"),chapter,version)
+    
+    # Ensure that we have a reference object
+    if type(ref_string_or_obj) is str:
+        ref = Reference.from_string(ref_string_or_obj)
     else:
-        URL = "https://www.biblegateway.com/passage/?search={}+{}:{}&version={}".format(book.replace(" ","+"),chapter,verse,version)
+        ref = ref_string_or_obj
+
+    # Just in case `ref` is actually a `Verse` instance, infer version
+    try:
+        _version = ref.version
+    except AttributeError:
+        _version = version
+
+    # Generate URL
+    if ref.verse is None:
+        URL = "https://www.biblegateway.com/passage/?search={}+{}&version={}".format(ref.book, ref.chapter, _version)
+    else:
+        URL = "https://www.biblegateway.com/passage/?search={}+{}:{}&version={}".format(ref.book, ref.chapter, ref.verse, _version)
 
     page = r.get(URL)
     
     sc = BeautifulSoup(page.content, "html.parser")
 
     if "No results found" in sc.text:
-        raise BadQueryError("Cannot get {} {} ({})".format(book,chapter,version))
+        raise BadQueryError("Cannot get {} ({})".format(ref.to_string(), _version))
     
     # Get all the p tags underneath the passage content
     #  which are all the verse, and no headings
@@ -55,7 +92,7 @@ def scrap(book, chapter, verse = None, version="ESV"):
                 vv = int(clsstr.split("-")[-1])
                 verse_ids[vv] = clsstr
 
-    # Generate a list of verse json objects
+    # Generate a list of Verse instances
     verses = []
     for i,v in enumerate(verse_ids.keys()):
         
@@ -77,15 +114,8 @@ def scrap(book, chapter, verse = None, version="ESV"):
             children += [" "]
         children.pop()
 
-        # Prep the json verse object
-        verses.append(dict(
-            text = "",
-            verse = v,
-            chapter = chapter,
-            book = book,
-            version = version,
-            footnotes = []
-        ))
+        # Prep verse object
+        verse = Verse(ref.book, ref.chapter, v, _version)
 
         # Loop through all the found verse html tags, and extract the text
         for obj in children:
@@ -94,7 +124,7 @@ def scrap(book, chapter, verse = None, version="ESV"):
             try:
                 obj.attrs
             except:
-                verses[i]["text"] = verses[i]["text"] + str(obj)
+                verse.text = verse.text + str(obj)
                 continue
 
             # Ignore html tags that don't have a class
@@ -105,20 +135,23 @@ def scrap(book, chapter, verse = None, version="ESV"):
 
             # Get the tetragrammoton
             if "small-caps" in obj.attrs['class']:
-                verses[i]["text"] = verses[i]["text"] + str(obj.text).upper()
+                verse.text = verse.text + str(obj.text).upper()
 
             # Get all the footnotes
             if "footnote" in obj.attrs['class']:
                 fn_id = obj.attrs['data-fn']
                 fn = sc.find(id=fn_id[1:]).find(class_="footnote-text")
                 fn.attrs['class'] = "bible-footnote"
-                verses[i]['footnotes'].append(dict(
-                    str_index = len(verses[i]['text']),
+                verse.add_footnote(dict(
+                    str_index = len(verse.text),
                     html = str(fn)
                 ))
                 continue
 
-    if verse is None:
+        # append the completed verse
+        verses.append(verse)
+
+    if ref.verse is None:
         return verses
     return verses[0]
 

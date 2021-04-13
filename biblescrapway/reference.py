@@ -19,7 +19,10 @@ def parse_reference_string(reference_string):
     """Parse reference string to list of range objects
     """
     string_list = reference_string.strip().replace(";",",").split(",")
-    return [Range.from_string(_string) for _string in string_list]
+    res = [Range.from_string(string_list.pop(0))]
+    for _string in string_list:
+        res.append(Range.from_string(_string, res[-1]))
+    return res
 
 def _get_normalized_book_name(string):
     """Get the full book name from partial string
@@ -33,7 +36,7 @@ def _get_normalized_book_name(string):
 class Reference:
     """A bible reference to either a chapter or verse
     """
-    BCV_regex = re.compile("^([A-Za-z0-9 \.]+)([0-9]+)[\.: ]?([0-9]*)$")
+    BCV_regex = re.compile("^([0-9]?[A-Za-z \._]+)([0-9]+)[\.: _]?([0-9]*)$")
     CV_regex = re.compile("^([0-9]+)[\.: ]([0-9]+)$")
     V_regex = re.compile("^([0-9]+)$")
 
@@ -42,7 +45,7 @@ class Reference:
         self.chapter = int(chapter)
         try:
             self.verse = int(verse)
-        except ValueError:
+        except (TypeError, ValueError):
             # This reference is to the whole chapter
             self.verse = None
 
@@ -50,12 +53,14 @@ class Reference:
         return "<{}>".format(self.to_string())
     
     def to_string(self):
+        if self.verse is None:
+            return "{} {}".format(self.book,self.chapter)
         return "{} {}:{}".format(self.book,self.chapter,self.verse)
     
     def is_before(self,other):
 
         # Handle book comparision
-        if self.book !== other.book:
+        if self.book != other.book:
             raise ReferenceError("Cannot compare reference orders from different books")
 
         # Handle Chapter comparison
@@ -95,6 +100,9 @@ class Reference:
             previous_chapter = previous.chapter
             previous_verse = previous.verse
         except AttributeError:
+            # TODO : I might want to use previous.end to play nice
+            #         with parse_reference_string(...), currently,
+            #         comma delimiting is broken
             # previous is a Range object
             previous_book = previous.book
             previous_verse = None
@@ -119,23 +127,25 @@ class Reference:
         
         raise ReferenceError("Cannot parse string `{}` with previous `{}`".format(_string,previous.to_string()))
 
-class Range
+class Range:
     def __init__(self, start_reference, end_reference):
-        try:
-            if not start_reference.is_before(end_reference):
-                self.start = end_reference
-                self.end = start_reference
-            else:
-                self.start = start_reference
-                self.end = end_reference
-        except ReferenceError as e:
-            raise ReferenceError("Cannot create range from provided references") from e
+        # try:
+        #     if not start_reference.is_before(end_reference):
+        #         self.start = end_reference
+        #         self.end = start_reference
+        #     else:
+        #         self.start = start_reference
+        #         self.end = end_reference
+        # except ReferenceError as e:
+        #     raise ReferenceError("Cannot create range from provided references") from e
+        self.start = start_reference
+        self.end = end_reference
 
     def __repr__(self):
         return "<{}>".format(self.to_string())
 
     def to_string(self):
-        return "{}-{}".format(self.start.to_string(), self.end.to_string())
+        return "{} - {}".format(self.start.to_string(), self.end.to_string())
 
     @property
     def book(self):
@@ -143,7 +153,23 @@ class Range
 
     @property
     def is_single(self):
-        return self.start.equals(self.end)
+        return (not self.start.verse is None) and self.start.equals(self.end)
+
+    def contains(self, ref):
+        if self.start.book != ref.book:
+            raise ReferenceError("Cannot compare references from different books")
+        
+        if self.start.verse is None and ref.chapter >= self.start.chapter:
+            ge_start = True
+        else:
+            ge_start = not ref.is_before(self.start)
+        
+        if self.end.verse is None and ref.chapter <= self.end.chapter:
+            le_end = True
+        else:
+            le_end = not self.end.is_before(ref)
+
+        return ge_start and le_end
 
     @classmethod
     def from_string(cls, string, previous = None):
@@ -157,6 +183,6 @@ class Range
 
         return cls(
             ref, 
-            Reference.from_string(strings[len(strings) == 1], ref)
+            Reference.from_string(strings[len(strings) == 2], ref)
         )
 
