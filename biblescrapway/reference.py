@@ -36,7 +36,7 @@ def _get_normalized_book_name(string):
 class Reference:
     """A bible reference to either a chapter or verse
     """
-    BCV_regex = re.compile("^([0-9]?[A-Za-z \._]+)([0-9]+)[\.: _]?([0-9]*)$")
+    BCV_regex = re.compile("^([0-9]?[ _\.]?[A-Za-z]+)[\._ ]*([0-9]+)[\.: _]?([0-9]*)$")
     CV_regex = re.compile("^([0-9]+)[\.: ]([0-9]+)$")
     V_regex = re.compile("^([0-9]+)$")
 
@@ -81,7 +81,7 @@ class Reference:
         return self.book == other.book \
             and self.chapter == other.chapter \
             and self.verse == other.verse
-
+    
     
     @classmethod
     def from_string(cls, string, previous = None):
@@ -100,12 +100,10 @@ class Reference:
             previous_chapter = previous.chapter
             previous_verse = previous.verse
         except AttributeError:
-            # TODO : I might want to use previous.end to play nice
-            #         with parse_reference_string(...), currently,
-            #         comma delimiting is broken
             # previous is a Range object
-            previous_book = previous.book
-            previous_verse = None
+            previous_book = previous.end.book
+            previous_chapter = previous.end.chapter
+            previous_verse = previous.end.verse
 
         match = cls.CV_regex.match(_string)
         if not match is None:
@@ -129,17 +127,18 @@ class Reference:
 
 class Range:
     def __init__(self, start_reference, end_reference):
-        # try:
-        #     if not start_reference.is_before(end_reference):
-        #         self.start = end_reference
-        #         self.end = start_reference
-        #     else:
-        #         self.start = start_reference
-        #         self.end = end_reference
-        # except ReferenceError as e:
-        #     raise ReferenceError("Cannot create range from provided references") from e
-        self.start = start_reference
-        self.end = end_reference
+        try:
+            if not (start_reference.is_before(end_reference) or start_reference.equals(end_reference)):
+                raise ReferenceError("Cannot make range with end before beginning")
+                # self.start = end_reference
+                # self.end = start_reference
+            else:
+                self.start = start_reference
+                self.end = end_reference
+        except ReferenceError as e:
+            raise ReferenceError("Cannot create range from provided references") from e
+        # self.start = start_reference
+        # self.end = end_reference
 
     def __repr__(self):
         return "<{}>".format(self.to_string())
