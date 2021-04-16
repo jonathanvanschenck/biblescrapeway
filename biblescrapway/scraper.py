@@ -38,6 +38,45 @@ class Verse(Reference):
     def add_footnote(self, footnote):
         self.footnotes.append(footnote)
 
+
+def _extract(obj, verse, sc):
+    # If no 'attrs', then this is probably just a string
+    #  so append it
+    try:
+        obj.attrs
+    except:
+        verse.text = verse.text + str(obj)
+        return
+
+    # Ignore html tags that don't have a class
+    try:
+        obj.attrs['class']
+    except:
+        return
+    
+    # Recursive call on `words of jesus` to unpack
+    if "woj" in obj.attrs['class']:
+        for child in obj.children:
+            _extract(child, verse, sc)
+
+    # Get the tetragrammoton
+    if "small-caps" in obj.attrs['class']:
+        verse.text = verse.text + str(obj.text).upper()
+        return
+
+    # Get all the footnotes
+    if "footnote" in obj.attrs['class']:
+        fn_id = obj.attrs['data-fn']
+        fn = sc.find(id=fn_id[1:]).find(class_="footnote-text")
+        fn.attrs['class'] = "bible-footnote"
+        verse.add_footnote(dict(
+            str_index = len(verse.text),
+            html = str(fn)
+        ))
+        return
+
+    # TODO : get cross references too?
+
 def scrap(ref_string_or_obj, version="ESV"):
     """Scrap a verse or chapter from the web
     Params
@@ -119,35 +158,7 @@ def scrap(ref_string_or_obj, version="ESV"):
 
         # Loop through all the found verse html tags, and extract the text
         for obj in children:
-            # If no 'attrs', then this is probably just a string
-            #  so append it
-            try:
-                obj.attrs
-            except:
-                verse.text = verse.text + str(obj)
-                continue
-
-            # Ignore html tags that don't have a class
-            try:
-                obj.attrs['class']
-            except:
-                continue
-
-            # Get the tetragrammoton
-            if "small-caps" in obj.attrs['class']:
-                verse.text = verse.text + str(obj.text).upper()
-
-            # Get all the footnotes
-            if "footnote" in obj.attrs['class']:
-                fn_id = obj.attrs['data-fn']
-                fn = sc.find(id=fn_id[1:]).find(class_="footnote-text")
-                fn.attrs['class'] = "bible-footnote"
-                verse.add_footnote(dict(
-                    str_index = len(verse.text),
-                    html = str(fn)
-                ))
-                continue
-
+            _extract(obj, verse, sc)
         # append the completed verse
         verses.append(verse)
 

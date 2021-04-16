@@ -10,7 +10,7 @@ Either pip install the requirements, or set up a python virtual environment firs
 
 # Basic Usage
 ## CLI
-`Biblescrapway` comes with a simple cli to pull specific bible passages:
+`biblescrapway` comes with a simple cli to pull specific bible passages:
 ```bash
  $ ./venv/bin/python command.py John3.16
 ```
@@ -44,8 +44,8 @@ the `.to_dict()` method. The resulting object has the following format:
     "book"    : "str | name of the bible book",
     "chapter" : "int | chapter number",
     "verse"   : "int | verse number",
-    "version" : "str | bible version abbreviation,
-    "text"    : "str | text content of the verse,
+    "version" : "str | bible version abbreviation",
+    "text"    : "str | text content of the verse",
     "footnotes" : [
         "..." : "...",
         {
@@ -58,7 +58,6 @@ the `.to_dict()` method. The resulting object has the following format:
 ```
 
 # Bugs
- - Red letters don't get captured ('woj' spans, c.f. 'John3:16')
 
 # TODO
  - Add more unit tests
