@@ -10,6 +10,8 @@ from .cleaner import clean_string
 # TODO : error check the r.get 
 
 class Verse(Reference):
+    """Verse object for bible verses
+    """
     def __init__(self, book, chapter, verse, version, text="", footnotes=None, crossrefs=None):
         super().__init__(book, chapter, verse)
         self.text = text
@@ -55,6 +57,8 @@ class Verse(Reference):
         self.footnotes.append(footnote)
 
     def equals(self, other):
+        """Checks if provided Verse is equal to this one
+        """
         if not isinstance(other,Verse):
             return False
         return self.version == other.version\

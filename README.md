@@ -1,37 +1,40 @@
 # Biblescrapeway
-A scraping tool for pulling bible verses from the web
-
-# Set Up
-Either pip install the requirements, or set up a python virtual environment first:
-```bash
- $ python3 -m venv venv
- $ ./venv/bin/pip install -r requirements.txt
-```
+A scraping tool for pulling bible verses from the web, [check it out here!](https://github.com/jonathanvanschenck/biblescrapeway)
 
 # Basic Usage
-## CLI
-`biblescrapeway` comes with a simple cli to pull specific bible passages:
+## Install with pip
 ```bash
- $ ./venv/bin/python command.py John3.16
+ $ pip3 install biblescrapeway
+```
+
+## CLI
+`biblescrapeway` comes with a simple cli (`bsw`) to pull specific bible passages:
+```bash
+ $ bsw John3.16
 ```
 
 You can also specify a version (default is ESV):
 ```bash
- $ ./venv/bin/python command.py --version KJV John3.16
+ $ bsw --version KJV John3.16
 ```
 
 Or, get multiple verses with comma delimiting:
 ```bash
- $ ./venv/bin/python command.py John3.16,1Peter3:8
+ $ bsw John3.16,1Peter3:8
 ```
 
 Or, get a range of verses using a hyphon
 ```bash
- $ ./venv/bin/python command.py John3.16-17
+ $ bsw John3.16-17
+```
+
+You can specify a formatting type with the `--format/-f` option, which exposes raw json:
+```bash
+ $ bsw -j json John3.16
 ```
 
 ## Programmatic
-It is also possible to get json-formatted verses via python, using the `scrap` function:
+It is also possible to get full verse objects via python, using the `scrap` function:
 ```python
 from biblescrapeway import scrap
 verse = scrap("John 3:16", version = "NIV")
@@ -47,32 +50,31 @@ the `.to_dict()` method. The resulting object has the following format:
     "version" : "str | bible version abbreviation",
     "text"    : "str | text content of the verse",
     "footnotes" : [
-        "..." : "...",
         {
             "str_index" : "int | index in text string of footnote location",
             "html"      : "str | html of footnote content"
-        },
-        "..." : "..."
+        }
     ],
     "crossrefs" : [
-        "..." : "...",
         {
             "str_index" : "int  | index in text string of footnote location",
             "ref_list"  : "list | list of strings of cross referenced verses"
-        },
-        "..." : "..."
+        }
     ]
 }
 ```
 
-# Bugs
+# Set up for development
+```bash
+ $ python3 -m venv venv
+ $ ./venv/bin/pip install -r requirements.txt
+ $ ./venv/bin/pip install --editable .
+```
 
-# For alpha release
- - Add readme worthy of pypi
- - slight refactor for better names
- - scrap.Verse refactorization options
- - spell check
+# Known Bugs
 
 # TODO
+ - Add WAY more documentations, like some docstrings for the modules . . 
  - Add more unit tests
  - expand cli?
+ - finish `string_cleaner` to convert special unicode characters into simpler characters

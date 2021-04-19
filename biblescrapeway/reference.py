@@ -1,7 +1,7 @@
 import re
 
 from .errors import ReferenceError
-from .varbs import book_regex
+from .constants import book_regex
 
 # TODO : document
 # TODO : test

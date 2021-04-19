@@ -11,13 +11,13 @@ def _format_line(obj, _format):
         return obj.to_string()
     if _format == 'str':
         return '`{}` ({})'.format(obj.text,obj.version)
-    # if _format == 'json':
-    #     string = json.dumps(obj.to_dict(), indent=4)
-    #     return "\n".join(["    " +s for s in string.split('\n')])
 
 def _formatter(obj_list, _format):
+    # Handle json
     if _format == 'json':
         return json.dumps([v.to_dict() for v in obj_list],indent=4)
+
+    # Handle everything else
     return "\n".join([_format_line(obj,_format) for obj in obj_list])
 
 @click.command(context_settings=CONTEXT_SETTINGS)
@@ -48,11 +48,4 @@ def scrap(version, reference_string, _format):
         verses += _verses
     
     click.echo(_formatter(verses, _format))
-    # string_list = [_formatter(v,_format) for v in verses]
-    # if _format == 'json':
-    #     click.echo("[\n" + ",\n".join(string_list) + "\n]")
-    #     return 
-    # click.echo("\n".join(string_list))
-    # for v in verses:
-    #     click.echo(v.to_string())
 
