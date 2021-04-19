@@ -10,7 +10,7 @@ Either pip install the requirements, or set up a python virtual environment firs
 
 # Basic Usage
 ## CLI
-`biblescrapway` comes with a simple cli to pull specific bible passages:
+`biblescrapeway` comes with a simple cli to pull specific bible passages:
 ```bash
  $ ./venv/bin/python command.py John3.16
 ```
@@ -33,7 +33,7 @@ Or, get a range of verses using a hyphon
 ## Programmatic
 It is also possible to get json-formatted verses via python, using the `scrap` function:
 ```python
-from biblescrapway import scrap
+from biblescrapeway import scrap
 verse = scrap("John 3:16", version = "NIV")
 verse.to_dict()
 ```

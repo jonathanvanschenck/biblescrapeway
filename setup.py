@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='biblescrapway',
+    name='biblescrapeway',
     version='0.1',
     packages=find_packages(),
     include_package_data=True,
@@ -10,6 +10,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        bsw=biblescrapway.cli:scrap
+        bsw=biblescrapeway.cli:scrap
     ''',
 )
