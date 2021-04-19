@@ -1,4 +1,4 @@
-# Biblescrapway
+# Biblescrapeway
 A scraping tool for pulling bible verses from the web
 
 # Set Up
@@ -53,13 +53,26 @@ the `.to_dict()` method. The resulting object has the following format:
             "html"      : "str | html of footnote content"
         },
         "..." : "..."
+    ],
+    "crossrefs" : [
+        "..." : "...",
+        {
+            "str_index" : "int  | index in text string of footnote location",
+            "ref_list"  : "list | list of strings of cross referenced verses"
+        },
+        "..." : "..."
     ]
 }
 ```
 
 # Bugs
 
+# For alpha release
+ - Add readme worthy of pypi
+ - slight refactor for better names
+ - scrap.Verse refactorization options
+ - spell check
+
 # TODO
  - Add more unit tests
- - Add pip installation methods
  - expand cli?

@@ -4,16 +4,28 @@ import requests as r
 
 from .errors import BadQueryError
 from .reference import Reference
+from .cleaner import clean_string
 
 # TODO : clean up the strings to be asciii safe? i.e. \u2014 -> '--'
 # TODO : error check the r.get 
 
 class Verse(Reference):
-    def __init__(self, book, chapter, verse, version, text="", footnotes=[]):
+    def __init__(self, book, chapter, verse, version, text="", footnotes=None, crossrefs=None):
         super().__init__(book, chapter, verse)
         self.text = text
         self.version = version
-        self.footnotes = footnotes
+    
+        # need to intantiate empty list here to prevent all Verse instances
+        #  sharing a reference to a single list object.
+        if footnotes is None:
+            self.footnotes = []
+        else:
+            self.footnotes = footnotes
+
+        if crossrefs is None:
+            self.crossrefs = []
+        else:
+            self.crossrefs = crossrefs
 
     def __repr__(self):
         return "<Verse: {}>".format(super().to_string())
@@ -28,16 +40,27 @@ class Verse(Reference):
             verse = self.verse,
             version = self.version,
             text = self.text,
-            footnotes = self.footnotes
+            footnotes = self.footnotes,
+            crossrefs = self.crossrefs
         )
 
     @classmethod
     def from_dict(cls,obj):
         return cls(**obj)
 
+    def add_crossref(self, crossref):
+        self.crossrefs.append(crossref)
+
     def add_footnote(self, footnote):
         self.footnotes.append(footnote)
 
+    def equals(self, other):
+        if not isinstance(other,Verse):
+            return False
+        return self.version == other.version\
+            and self.chapter == other.chapter\
+            and self.book == other.book\
+            and self.verse == other.verse
 
 def _extract(obj, verse, sc):
     # If no 'attrs', then this is probably just a string
@@ -45,7 +68,7 @@ def _extract(obj, verse, sc):
     try:
         obj.attrs
     except:
-        verse.text = verse.text + str(obj)
+        verse.text = verse.text + clean_string(obj)
         return
 
     # Ignore html tags that don't have a class
@@ -53,7 +76,6 @@ def _extract(obj, verse, sc):
         obj.attrs['class']
     except:
         return
-    
     # Recursive call on `words of jesus` to unpack
     if "woj" in obj.attrs['class']:
         for child in obj.children:
@@ -61,17 +83,36 @@ def _extract(obj, verse, sc):
 
     # Get the tetragrammoton
     if "small-caps" in obj.attrs['class']:
-        verse.text = verse.text + str(obj.text).upper()
+        verse.text = verse.text + clean_string(obj.text).upper()
         return
 
     # Get all the footnotes
     if "footnote" in obj.attrs['class']:
         fn_id = obj.attrs['data-fn']
         fn = sc.find(id=fn_id[1:]).find(class_="footnote-text")
-        fn.attrs['class'] = "bible-footnote"
+        html = ""
+        for child in fn.children:
+            try:
+                child.attrs['class']
+            except:
+                html = html + clean_string(child)
+            else:
+                if "bibleref" in child.attrs['class']:
+                    html = html + clean_string(child.text)
+        # fn.attrs['class'] = "bible-footnote"
         verse.add_footnote(dict(
             str_index = len(verse.text),
-            html = str(fn)
+            html = html#str(fn)
+        ))
+        return
+
+    # Get all the crossreferences
+    if "crossreference" in obj.attrs['class']:
+        cr_id = obj.attrs['data-cr']
+        cr = sc.find(id=cr_id[1:]).find(class_="crossref-link")
+        verse.add_crossref(dict(
+            str_index = len(verse.text),
+            ref_list = [s.strip() for s in cr.attrs['data-bibleref'].split(",")]
         ))
         return
 
@@ -158,9 +199,14 @@ def scrap(ref_string_or_obj, version="ESV"):
 
         # Loop through all the found verse html tags, and extract the text
         for obj in children:
+            # try:
+            #     print(obj.text)
+            # except:
+            #     print(obj)
             _extract(obj, verse, sc)
         # append the completed verse
-        verses.append(verse)
+        if verse.text != "":
+            verses.append(verse)
 
     if ref.verse is None:
         return verses
