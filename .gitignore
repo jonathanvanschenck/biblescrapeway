@@ -1,5 +1,6 @@
 __pycache__
 *egg-info
+dist
 index
 test.py
 test2.py

@@ -30,7 +30,7 @@ Or, get a range of verses using a hyphon
 
 You can specify a formatting type with the `--format/-f` option, which exposes raw json:
 ```bash
- $ bsw -j json John3.16
+ $ bsw -f json John3.16
 ```
 
 ## Programmatic
