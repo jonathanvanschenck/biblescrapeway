@@ -310,5 +310,28 @@ class BCVRegex(unittest.TestCase):
         self.match("1", None)
         self.match("15", None)
 
+class ToString(unittest.TestCase):
+    
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_range_to_string(self):
+        """Can convert ranges to strings
+        """
+        for instring, outstring in [
+            ["Gen1:2", "Genesis 1:2"],
+            ["Gen1:2-3", "Genesis 1:2-3"],
+            ["Gen1-2", "Genesis 1-2"],
+            ["Gen1-2:2", "Genesis 1-2:2"],
+            ["Gen11:12-11:13", "Genesis 11:12-13"],
+            ["Gen10:12-13:2", "Genesis 10:12-13:2"]
+        ]:
+            self.assertEqual(ref.Range.from_string(instring).to_string(), outstring)
+
+
+
 if __name__ == "__main__":
     unittest.main()

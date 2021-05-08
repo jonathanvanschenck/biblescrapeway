@@ -5,13 +5,14 @@ from .constants import book_regex
 
 # TODO : document
 # TODO : test
+# TODO : create to_simple_string function?
 
 
 def normalize_reference_string(reference_string):
     """Expand a reference string to full reference
     """
     return [
-        ref.start.to_string() if ref.is_single else ref.to_string()\
+        ref.start.to_string() if ref.is_single_verse else ref.to_string()\
         for ref in parse_reference_string(reference_string)
     ]
 
@@ -151,8 +152,12 @@ class Range:
         return self.start.book
 
     @property
-    def is_single(self):
+    def is_single_verse(self):
         return (not self.start.verse is None) and self.start.equals(self.end)
+
+    @property
+    def is_single_chapter(self):
+        return (self.start.verse is None) and self.start.equals(self.end)
 
     def contains(self, ref):
         if self.start.book != ref.book:
@@ -169,6 +174,24 @@ class Range:
             le_end = not self.end.is_before(ref)
 
         return ge_start and le_end
+
+    def to_string(self):
+        string = "{} {}".format(self.start.book, self.start.chapter)
+        if not self.start.verse is None:
+            string = string + ":{}".format(self.start.verse)
+        if self.start.equals(self.end):
+            return string
+
+        string = string + "-"
+
+        if self.end.chapter == self.start.chapter:
+            return string + "{}".format(self.end.verse)
+
+        if self.end.verse is None:
+            return string + "{}".format(self.end.chapter)
+
+        return string + "{}:{}".format(self.end.chapter, self.end.verse)
+
 
     @classmethod
     def from_string(cls, string, previous = None):

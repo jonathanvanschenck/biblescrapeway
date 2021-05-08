@@ -33,11 +33,21 @@ You can specify a formatting type with the `--format/-f` option, which exposes r
  $ bsw -f json John3.16
 ```
 
+You can also set the `--cache/--no-cache` flag to cache the results of queries locally, so
+that they can just be looked up on repeated evaluations. By default, `bsw` uses `--no-cache`.
+```bash
+ $ bsw John3.16         # scraps the verse from the web
+ $ bsw John3.16         # scraps the verse from the web again
+ $ bsw --cache John3.16 # scraps the verse, then saves it locally at '~/.bsw_cache.json'
+ $ bsw --cache John3.16 # looks up the verse locally, does not re-scrap it
+ $ bsw John3.16         # scraps the verse from the web again
+```
+
 ## Programmatic
 It is also possible to get full verse objects via python, using the `scrap` function:
 ```python
-from biblescrapeway import scrap
-verse = scrap("John 3:16", version = "NIV")
+from biblescrapeway import query
+verse = query("John 3:16", version = "NIV")[0]
 verse.to_dict()
 ```
 The function returns a `scraper.Verse` object, which can be convered into a `dict` using
@@ -64,6 +74,12 @@ the `.to_dict()` method. The resulting object has the following format:
 }
 ```
 
+The caching functionality is also accessible from the `query` function as:
+```python
+verse_list = query("John3.16", cache=True) # scraps from the web
+verse_list = query("John3.16", cache=True) # just looks result up
+```
+
 # Set up for development
 ```bash
  $ python3 -m venv venv
@@ -78,3 +94,5 @@ the `.to_dict()` method. The resulting object has the following format:
  - Add more unit tests
  - expand cli?
  - finish `string_cleaner` to convert special unicode characters into simpler characters
+ - standardize some of the naming -- inconsisten use of `reference` to sometimes mean `Range`,
+also, `scrap` is pretty overloaded.

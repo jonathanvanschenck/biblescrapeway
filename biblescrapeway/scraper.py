@@ -120,7 +120,6 @@ def _extract(obj, verse, sc):
         ))
         return
 
-    # TODO : get cross references too?
 
 def scrap(ref_string_or_obj, version="ESV"):
     """Scrap a verse or chapter from the web
