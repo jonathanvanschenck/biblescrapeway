@@ -16,6 +16,26 @@ def normalize_reference_string(reference_string):
         for ref in parse_reference_string(reference_string)
     ]
 
+def shorten_reference_string(reference_string):
+    """Shorten a reference string
+
+    Returns the minimum necessary string to unambigiously
+    list references: E.g. `Genesis 1, Genesis 2` -> `Genesis 1, 2`
+    """
+    range_list = parse_reference_string(reference_string)
+    if len(range_list) == 0:
+        return ""
+
+    string_list = [range_list[0].to_string()]
+    if len(range_list) == 1:
+        return string_list[0]
+
+    for i in range(1,len(range_list)):
+        string_list.append(range_list[i].to_string_short(range_list[i-1]))
+
+    return ", ".join(string_list)
+
+
 def parse_reference_string(reference_string):
     """Parse reference string to list of range objects
     """
@@ -191,6 +211,25 @@ class Range:
             return string + "{}".format(self.end.chapter)
 
         return string + "{}:{}".format(self.end.chapter, self.end.verse)
+
+    def to_string_short(self, previous = None):
+        """Generate the shortest reference string from this range
+        """
+        full = self.to_string()
+
+        if previous is None or previous.start.book != self.start.book:
+            return full
+
+        # FIXME : assume Gen1:1-3:4,6 means also 3:6
+        if (
+            self.start.is_before(previous.end)\
+            or previous.end.chapter != self.start.chapter\
+            or self.start.chapter != self.end.chapter
+        ):
+            # Truncate only the book name
+            return full.split(" ")[-1]
+
+        return full.split(" ")[-1].split(":")[-1]
 
 
     @classmethod

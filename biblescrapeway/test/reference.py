@@ -331,6 +331,28 @@ class ToString(unittest.TestCase):
         ]:
             self.assertEqual(ref.Range.from_string(instring).to_string(), outstring)
 
+    def test_range_to_string_short(self):
+        """Can convert range lists to short strings
+        """
+        for instring, outstring in [
+            # Single references
+            ["Gen1:2", "Genesis 1:2"],
+            ["Gen1:2-3", "Genesis 1:2-3"],
+            ["Gen1-2", "Genesis 1-2"],
+            ["Gen1-2:2", "Genesis 1-2:2"],
+            ["Gen11:12-11:13", "Genesis 11:12-13"],
+            ["Gen10:12-13:2", "Genesis 10:12-13:2"],
+            ["Gen1, Ex2", "Genesis 1, Exodus 2"],
+            ["Gen1:1, Ex1:1", "Genesis 1:1, Exodus 1:1"],
+            ["Gen1:1-3:4, Ex2:3", "Genesis 1:1-3:4, Exodus 2:3"],
+            ["Gen1:1, Gen2:3", "Genesis 1:1, 2:3"],
+            ["Gen1:1, Gen1:2", "Genesis 1:1, 2"],
+            ["Gen1:3-5,1:6", "Genesis 1:3-5, 6"], # FIXME
+            ["Gen1-2, 4", "Genesis 1-2, 4"],
+            ["Gen1:2-4:6, 5:6-6:1", "Genesis 1:2-4:6, 5:6-6:1"]
+        ]:
+            self.assertEqual(ref.shorten_reference_string(instring),outstring)
+
 
 
 if __name__ == "__main__":

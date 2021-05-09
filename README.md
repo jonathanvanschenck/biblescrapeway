@@ -96,3 +96,4 @@ verse_list = query("John3.16", cache=True) # just looks result up
  - finish `string_cleaner` to convert special unicode characters into simpler characters
  - standardize some of the naming -- inconsisten use of `reference` to sometimes mean `Range`,
 also, `scrap` is pretty overloaded.
+ - Descide how to handle 'Genesis 1:3-4:5,6', does that last one mean verse 6 or chapter 6?

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='biblescrapeway',
-    version='0.1.3',
+    version='0.1.4',
     author="Jonathan D B Van Schenck",
     author_email="vanschej@oregonstate.edu",
     description='A tool for scraping bible verses from the web',
