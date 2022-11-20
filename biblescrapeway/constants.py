@@ -18,7 +18,7 @@ book_regex = [
     ["[Nn]e","Nehemiah", 13],
     ["[Ee]s","Esther", 10],
     ["[Jj]ob","Job", 42],
-    ["[Pp]s","Psalms", 150],
+    ["[Pp]s","Psalm", 150],
     ["[Pp]r","Proverbs", 31],
     ["[Ee]c","Ecclesiastes", 12],
     ["[Ss]o","Song of Solomon", 8],

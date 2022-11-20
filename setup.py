@@ -1,11 +1,16 @@
 from setuptools import setup
 
+# Extract the __version__ variable
+with open("biblescrapeway/version.py") as f:
+    exec(f.read())
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
 setup(
     name='biblescrapeway',
-    version='0.1.4',
+    version=__version__,
     author="Jonathan D B Van Schenck",
     author_email="vanschej@oregonstate.edu",
     description='A tool for scraping bible verses from the web',
