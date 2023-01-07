@@ -11,7 +11,7 @@ book_regex = [
     ["1[ _]?[Ss]","1 Samuel", 31],
     ["2[ _]?[Ss]","2 Samuel", 24],
     ["1[ _]?[Kk]","1 Kings", 22],
-    ["1[ _]?[Kk]","2 Kings", 25],
+    ["2[ _]?[Kk]","2 Kings", 25],
     ["1[ _]?[Cc]h","1 Chronicles", 29],
     ["2[ _]?[Cc]h","2 Chronicles", 36],
     ["[Ee]zr","Ezra", 10],
