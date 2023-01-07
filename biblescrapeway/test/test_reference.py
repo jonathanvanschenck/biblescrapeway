@@ -1,7 +1,7 @@
 import unittest
 
-from ..src import reference as ref
-from ..src.constants import book_regex
+from .. import reference as ref
+from ..constants import book_regex
 
 class BookNormalization(unittest.TestCase):
     

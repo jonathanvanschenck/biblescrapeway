@@ -3,7 +3,7 @@ import json
 
 from pathlib import Path
 
-from .src.query import query
+from .query import query
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
