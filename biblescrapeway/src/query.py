@@ -4,7 +4,7 @@
 from pathlib import Path
 
 from .reference import Reference, parse_reference_string
-from .scraper import scrap
+from .scraper import scrape
 from .cache import BibleCacher
 
 def query( query_string, version = "ESV", cache = False, cache_fp = None ):
@@ -48,7 +48,7 @@ def query( query_string, version = "ESV", cache = False, cache_fp = None ):
         # If the lookup fails, run a query
         if _verses is None:
             if _range.is_single_verse:
-                _verses = [scrap(_range.start,version)]
+                _verses = [scrape(_range.start,version)]
             else:
                 # If the range is contains more than one verse, query all
                 #  chapters. Necessary, since some versions exclude some
@@ -62,7 +62,7 @@ def query( query_string, version = "ESV", cache = False, cache_fp = None ):
                 ]
                 _verses = []
                 for ref in chaps:
-                    _verses += scrap(ref,version)
+                    _verses += scrape(ref,version)
                 _verses = [v for v in _verses if _range.contains(v)]
         
         # Cache the verses

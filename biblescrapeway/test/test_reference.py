@@ -1,7 +1,7 @@
 import unittest
 
-from .. import reference as ref
-
+from ..src import reference as ref
+from ..src.constants import book_regex
 
 class BookNormalization(unittest.TestCase):
     
@@ -19,17 +19,25 @@ class BookNormalization(unittest.TestCase):
     def test_match_full_name(self):
         """Can match full book name
         """
-        self.assertEqual(ref._get_normalized_book_name("Genesis"),"Genesis")
+        for [_,name,_] in book_regex:
+            self.assertEqual(ref._get_normalized_book_name(name),name)
 
     def test_match_partial_name(self):
         """Can match partial book name
         """
         self.assertEqual(ref._get_normalized_book_name("Gen"),"Genesis")
+        self.assertEqual(ref._get_normalized_book_name("1K"),"1 Kings")
+        self.assertEqual(ref._get_normalized_book_name("1_K"),"1 Kings")
+        self.assertEqual(ref._get_normalized_book_name("1 K"),"1 Kings")
+        self.assertEqual(ref._get_normalized_book_name("So"),"Song of Solomon")
+        self.assertEqual(ref._get_normalized_book_name("Song of"),"Song of Solomon")
 
     def test_match_abbreviated_name(self):
         """Can match abbreviated book name
         """
         self.assertEqual(ref._get_normalized_book_name("Gen."),"Genesis")
+        self.assertEqual(ref._get_normalized_book_name("Son. of S."),"Song of Solomon")
+        self.assertEqual(ref._get_normalized_book_name("SoS"),"Song of Solomon")
 
 
 
@@ -203,6 +211,7 @@ class VRegex(unittest.TestCase):
         self.match("15", ["15"])
 
 
+
 class CVRegex(unittest.TestCase):
 
     def match(self, string, expect):
@@ -293,6 +302,12 @@ class BCVRegex(unittest.TestCase):
         self.match("1_John4:15", ["1_John", "4", "15"])
         self.match("1.John4:15", ["1.John", "4", "15"])
 
+        # matches Multi-words
+        self.match("So1.1", ["So", "1", "1"])
+        self.match("Song of Solomon 1:1", ["Song of Solomon", "1", "1"])
+        self.match("Song of Sol 1:1", ["Song of Sol", "1", "1"])
+        self.match("Song o 1:1", ["Song o", "1", "1"])
+
     def test_partial_reference(self):
         """Matches partial references
         """
@@ -300,6 +315,10 @@ class BCVRegex(unittest.TestCase):
         self.match("Gen 1:1", ["Gen", "1", "1"])
         self.match("Gen.1:1", ["Gen", "1", "1"])
         self.match("Gen1:1", ["Gen", "1", "1"])
+
+
+
+
 
     def test_incomplete_reference(self):
         """Doesn't Match incomplete references

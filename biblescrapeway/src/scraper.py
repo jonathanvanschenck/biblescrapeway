@@ -121,8 +121,8 @@ def _extract(obj, verse, sc):
         return
 
 
-def scrap(ref_string_or_obj, version="ESV"):
-    """Scrap a verse or chapter from the web
+def scrape(ref_string_or_obj, version="ESV"):
+    """Scrape a verse or chapter from the web
     Params
     ------
     ref_string_or_obj : str or Reference

@@ -31,6 +31,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        bsw=biblescrapeway.cli:scrap
+        bsw=biblescrapeway.cli:scrape
     ''',
 )

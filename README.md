@@ -44,7 +44,7 @@ that they can just be looked up on repeated evaluations. By default, `bsw` uses 
 ```
 
 ## Programmatic
-It is also possible to get full verse objects via python, using the `scrap` function:
+It is also possible to get full verse objects via python, using the `query` function:
 ```python
 from biblescrapeway import query
 verse = query("John 3:16", version = "NIV")[0]
@@ -80,11 +80,24 @@ verse_list = query("John3.16", cache=True) # scraps from the web
 verse_list = query("John3.16", cache=True) # just looks result up
 ```
 
-# Set up for development
+## Development
+
 ```bash
- $ python3 -m venv venv
- $ ./venv/bin/pip install -r requirements.txt
- $ ./venv/bin/pip install --editable .
+# Create the venv
+python3 -m venv venv
+./venv/bin/pip install -r requirements.txt
+
+# install for development
+./venv/bin/pip install --editable .
+
+# Test
+./scripts/run_tests.sh
+
+# Build
+./scripts/build.sh
+
+# Deploy
+twine upload dist/*
 ```
 
 # Known Bugs

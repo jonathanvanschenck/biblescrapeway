@@ -50,14 +50,14 @@ def _get_normalized_book_name(string):
     """
     _string = string.strip()
     for regex in book_regex:
-        if re.match(regex[0] + "[a-z\.]*", _string):
+        if re.match(regex[0] + "[A-Za-z\. _]*$", _string):
             return regex[1]
     raise ReferenceError("Cannot find book `{}`".format(_string))
 
 class Reference:
     """A bible reference to either a chapter or verse
     """
-    BCV_regex = re.compile("^([0-9]?[ _\.]?[A-Za-z]+)[\._ ]*([0-9]+)[\.: _]?([0-9]*)$")
+    BCV_regex = re.compile("^([0-9]?[ _\.]?[A-Za-z]+|[A-Za-z][A-Za-z\._ ]*[A-Za-z])[\._ ]*([0-9]+)[\.: _]?([0-9]*)$")
     CV_regex = re.compile("^([0-9]+)[\.: ]([0-9]+)$")
     V_regex = re.compile("^([0-9]+)$")
 

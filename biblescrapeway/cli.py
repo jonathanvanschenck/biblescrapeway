@@ -3,7 +3,7 @@ import json
 
 from pathlib import Path
 
-from .query import query
+from .src.query import query
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -28,8 +28,8 @@ def _formatter(obj_list, _format):
 @click.option('--cache/--no-cache',  default=False, 
         help='Look up verses saved in a local cache first, and save new queries locally')
 @click.argument('reference_string')
-def scrap(version, reference_string, _format, cache):
-    """Scrap bible verses
+def scrape(version, reference_string, _format, cache):
+    """Scrape bible verses
 
     REFERENCE_STRING a (comma delimited) list of references, e.g. `John3.16` or `1Peter3.1-5` or `Gen1,2`
     """

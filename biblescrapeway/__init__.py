@@ -1,11 +1,11 @@
 """`biblescrapeway` tool for scraping bible verses from the web
 """
 
-from . import scraper
-from . import errors
-from . import reference
+from .src import scraper
+from .src import errors
+from .src import reference
 from . import cli
-from .query import query
+from .src.query import query
 from .version import __version__
 
 
