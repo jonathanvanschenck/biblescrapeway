@@ -13,9 +13,9 @@ A scraping tool for pulling bible verses from the web, [check it out here!](http
  $ bsw John3.16
 ```
 
-You can also specify a version (default is ESV):
+You can also specify a translation (default is ESV):
 ```bash
- $ bsw --version KJV John3.16
+ $ bsw --translation KJV John3.16
 ```
 
 Or, get multiple verses with comma delimiting:
