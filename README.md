@@ -39,7 +39,7 @@ that they can just be looked up on repeated evaluations. By default, `bsw` uses 
  $ bsw John3.16         # scraps the verse from the web
  $ bsw John3.16         # scraps the verse from the web again
  $ bsw --cache John3.16 # scraps the verse, then saves it locally at '~/.bsw_cache.json'
- $ bsw --cache John3.16 # looks up the verse locally, does not re-scrap it
+ $ bsw --cache John3.16 # looks up the verse locally, does not re-scrape it
  $ bsw John3.16         # scraps the verse from the web again
 ```
 
@@ -103,10 +103,12 @@ twine upload dist/*
 # Known Bugs
 
 # TODO
+ - Add more than just bgw as the scraping backend
+ - More carefully handle formatting (unicode, text transforms, woj, etc).
  - Add WAY more documentations, like some docstrings for the modules . . 
  - Add more unit tests
  - expand cli?
  - finish `string_cleaner` to convert special unicode characters into simpler characters
  - standardize some of the naming -- inconsisten use of `reference` to sometimes mean `Range`,
-also, `scrap` is pretty overloaded.
+also, `scrape` is pretty overloaded.
  - Descide how to handle 'Genesis 1:3-4:5,6', does that last one mean verse 6 or chapter 6?
