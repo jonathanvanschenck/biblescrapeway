@@ -26,7 +26,7 @@ def _formatter(obj_list, _format):
 @click.option('--translation', '-t', default='ESV', help='Bible translation to query, default is `ESV`')
 @click.option('--format', '-f', '_format', default='refstr', type=click.Choice(['refstr','str','json']),
         help='Specify output format, default is `refstr`')
-@click.option('--cache/--no-cache',  default=False, 
+@click.option('--cache/--no-cache',  default=True, 
         help='Look up verses saved in a local cache first, and save new queries locally')
 @click.argument('reference_string')
 @click.version_option(message='%(version)s', version=__version__)

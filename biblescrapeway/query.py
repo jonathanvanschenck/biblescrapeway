@@ -7,7 +7,7 @@ from .reference import Reference, parse_reference_string
 from .scraper import scrape
 from .cache import BibleCacher
 
-def query( query_string, version = "ESV", cache = False, cache_fp = None ):
+def query( query_string, version = "ESV", cache = True, cache_fp = None ):
     """Look up a bible verse, range or list
 
     Parameters

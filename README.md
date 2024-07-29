@@ -34,13 +34,13 @@ You can specify a formatting type with the `--format/-f` option, which exposes r
 ```
 
 You can also set the `--cache/--no-cache` flag to cache the results of queries locally, so
-that they can just be looked up on repeated evaluations. By default, `bsw` uses `--no-cache`.
+that they can just be looked up on repeated evaluations. By default, `bsw` uses `--cache`.
 ```bash
- $ bsw John3.16         # scraps the verse from the web
- $ bsw John3.16         # scraps the verse from the web again
- $ bsw --cache John3.16 # scraps the verse, then saves it locally at '~/.bsw_cache.json'
- $ bsw --cache John3.16 # looks up the verse locally, does not re-scrape it
- $ bsw John3.16         # scraps the verse from the web again
+ $ bsw --no-cache John3.16 # scraps the verse from the web
+ $ bsw --no-cache John3.16 # scraps the verse from the web again
+ $ bsw --cache John3.16    # scraps the verse, then saves it locally at '~/.bsw_cache.json'
+ $ bsw --cache John3.16    # looks up the verse locally, does not re-scrape it
+ $ bsw --no-cache John3.16 # scraps the verse from the web again
 ```
 
 ## Programmatic
