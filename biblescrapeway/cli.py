@@ -11,8 +11,10 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 def _format_line(obj, _format):
     if _format == 'refstr':
         return obj.to_string()
+    if _format == 'short':
+        return '{}: {}'.format(obj.verse, obj.text)
     if _format == 'str':
-        return '`{}` ({})'.format(obj.text,obj.version)
+        return '{}'.format(obj.text)
 
 def _formatter(obj_list, _format):
     # Handle json
@@ -24,7 +26,7 @@ def _formatter(obj_list, _format):
 
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('--translation', '-t', default='ESV', help='Bible translation to query, default is `ESV`')
-@click.option('--format', '-f', '_format', default='refstr', type=click.Choice(['refstr','str','json']),
+@click.option('--format', '-f', '_format', default='refstr', type=click.Choice(['refstr','str','json','short']),
         help='Specify output format, default is `refstr`')
 @click.option('--cache/--no-cache',  default=True, 
         help='Look up verses saved in a local cache first, and save new queries locally')
