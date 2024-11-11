@@ -171,7 +171,7 @@ def scrape(ref_string_or_obj, version="ESV"):
     verse_ids = dict()
     for node in sc.find_all(class_="text"):
         for clsstr in node.attrs['class']:
-            if re.match("[A-Za-z0-9]+[-]\d+[-]\d+",clsstr):
+            if re.match(r"[A-Za-z0-9]+-\d+-\d+", clsstr):
                 vv = int(clsstr.split("-")[-1])
                 verse_ids[vv] = clsstr
 
